@@ -80,7 +80,7 @@ task.spawn(function()
 end)
 
 local function MakeDraggable(DragPoint, Main)
-	pcall(function()
+	--pcall(function()
 		local Dragging, DragInput, MousePos, FramePos = false
 		AddConnection(DragPoint.InputBegan, function(Input)
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -107,7 +107,7 @@ local function MakeDraggable(DragPoint, Main)
 				Main.Position  = UDim2.new(FramePos.X.Scale,FramePos.X.Offset + Delta.X, FramePos.Y.Scale, FramePos.Y.Offset + Delta.Y)
 			end
 		end)
-	end)
+	--end)
 end    
 
 local function Create(Name, Properties, Children)
@@ -247,7 +247,10 @@ local function SaveCfg(Name)
 			end
 		end	
 	end
-	writefile(OrionLib.Folder .. "/" .. Name .. ".txt", tostring(HttpService:JSONEncode(Data)))
+
+	if writefile then
+		writefile(OrionLib.Folder .. "/" .. Name .. ".txt", tostring(HttpService:JSONEncode(Data)))
+	end
 end
 
 local WhitelistedMouse = {Enum.UserInputType.MouseButton1, Enum.UserInputType.MouseButton2,Enum.UserInputType.MouseButton3}
@@ -432,6 +435,7 @@ function OrionLib:MakeNotification(NotificationConfig)
 				Position = UDim2.new(0, 0, 0, 25),
 				Font = Enum.Font.GothamSemibold,
 				Name = "Content",
+				RichText = true,
 				AutomaticSize = Enum.AutomaticSize.Y,
 				TextColor3 = Color3.fromRGB(200, 200, 200),
 				TextWrapped = true
@@ -456,7 +460,7 @@ function OrionLib:MakeNotification(NotificationConfig)
 end    
 
 function OrionLib:Init()
-	if OrionLib.SaveCfg then	
+	if OrionLib.SaveCfg and (isfile and readfile) then	
 		pcall(function()
 			if isfile(OrionLib.Folder .. "/" .. game.GameId .. ".txt") then
 				LoadCfg(readfile(OrionLib.Folder .. "/" .. game.GameId .. ".txt"))
@@ -494,7 +498,7 @@ function OrionLib:MakeWindow(WindowConfig)
 	OrionLib.SaveCfg = WindowConfig.SaveConfig
 
 	if WindowConfig.SaveConfig then
-		if not isfolder(WindowConfig.ConfigFolder) then
+		if (isfolder and makefolder) and not isfolder(WindowConfig.ConfigFolder) then
 			makefolder(WindowConfig.ConfigFolder)
 		end	
 	end
@@ -698,21 +702,47 @@ function OrionLib:MakeWindow(WindowConfig)
 	end
 
 	MakeDraggable(DragPoint, MainWindow)
+	
+	-- @ UI Visible & Mobile Icon Handle (Zv-yz/github);
+	local _currentKey = Enum.KeyCode.RightShift;
+	local isMobile = table.find({ Enum.Platform.IOS, Enum.Platform.Android }, UserInputService:GetPlatform());
+	local MobileIcon = SetChildren(SetProps(MakeElement("ImageButton", "http://www.roblox.com/asset/?id=17570737246"), {
+		Position = UDim2.new(0.25, 0, 0.1, 0);
+		Size = UDim2.new(0, 32, 0, 33);
+		-- Position = UDim2.new(0.52, 0, 0, 0);
+		-- Size = UDim2.new(0.045, 0, 0.089, 0);
+		-- Draggable = true;
+		Parent = Orion;
+		Visible = false;
+	}), { MakeElement("Corner", 1, 0) });
+
+	MakeDraggable(MobileIcon, MobileIcon)
+
+	AddConnection(MobileIcon.MouseButton1Click, function()
+		MainWindow.Visible = true;
+		MobileIcon.Visible = false;
+	end)
 
 	AddConnection(CloseBtn.MouseButton1Up, function()
 		MainWindow.Visible = false
 		UIHidden = true
+		
+		if UserInputService.TouchEnabled then
+			MobileIcon.Visible = true;
+		end
+		
 		OrionLib:MakeNotification({
-			Name = "Interface Fechada",
-			Content = "Execute Nosso Script Novamente!",
+			Name = "Interface fechada",
+			Content = (isMobile and 'Clique na <b>Icon' or 'Pressione a tecla <b>' .. _currentKey.Name) .. "</b> para abrir a GUI novamente!",
 			Time = 5
 		})
 		WindowConfig.CloseCallback()
 	end)
 
 	AddConnection(UserInputService.InputBegan, function(Input)
-		if Input.KeyCode == Enum.KeyCode.RightShift and UIHidden then
-			MainWindow.Visible = true
+		if Input.KeyCode == _currentKey then
+			MobileIcon.Visible = false; -- Ja que ele usou Teclado, creio que precisa esconder icone de mobile. 
+			MainWindow.Visible = not MainWindow.Visible;
 		end
 	end)
 
@@ -771,10 +801,11 @@ function OrionLib:MakeWindow(WindowConfig)
 
 	if WindowConfig.IntroEnabled then
 		LoadSequence()
-	end	
+	end
 
-	local TabFunction = {}
-	function TabFunction:MakeTab(TabConfig)
+	local Functions = {}
+
+	function Functions:MakeTab(TabConfig)
 		TabConfig = TabConfig or {}
 		TabConfig.Name = TabConfig.Name or "Tab"
 		TabConfig.Icon = TabConfig.Icon or ""
@@ -1360,7 +1391,7 @@ function OrionLib:MakeWindow(WindowConfig)
 							Holding = true
 							BindConfig.Callback(Holding)
 						else
-							BindConfig.Callback()
+							BindConfig.Callback(Input)
 						end
 					elseif Bind.Binding then
 						local Key
@@ -1764,8 +1795,20 @@ function OrionLib:MakeWindow(WindowConfig)
 		end
 		return ElementFunction   
 	end
-
-	return TabFunction
+	
+	function Functions:ChangeKey(Keybind: Enum.KeyCode)
+		_currentKey = Keybind;
+	end;
+	
+	function Functions:Destroy()
+		for _, Connection in next, OrionLib.Connections do
+			Connection:Disconnect()
+		end
+		MainWindow:Destroy()
+		MobileIcon:Destroy()
+	end
+	
+	return Functions;
 end   
 
 function OrionLib:Destroy()
