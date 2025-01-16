@@ -5,7 +5,7 @@ local LocalPlayer = game:GetService("Players").LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 local HttpService = game:GetService("HttpService")
 
-if getgenv.LEEN_DEBUG then
+if getgenv().LEEN_DEBUG then
 	warn("[ DEBUG SCRIPT ]")
 
 	warn("Swift Function:", switf_internal_correct)
