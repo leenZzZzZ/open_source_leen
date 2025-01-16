@@ -10,7 +10,7 @@ if getgenv().LEEN_DEBUG then
 
 	warn("Swift Function:", swift_internal_correct)
 	warn("Gethui Function:", gethui)
-	warn("Check:", switf_internal_correct and "Swift Issue" or gethui and "Normal" or game:GetService("CoreGui") and "Normal ²")
+	warn("Check:", swift_internal_correct and "Swift Issue" or gethui and "Normal" or game:GetService("CoreGui") and "Normal ²")
 
 	warn("[ DEBUG END ]")
 end
