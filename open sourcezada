@@ -5,7 +5,9 @@ local LocalPlayer = game:GetService("Players").LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 local HttpService = game:GetService("HttpService")
 
-local PARENT = (gethui and gethui()) or game:GetService('CoreGui')
+local PARENT = switf_internal_correct and game:GetService("CoreGui")
+	or gethui and gethui()
+	or game:GetService("CoreGui")
 
 local OrionLib = {
 	Elements = {},
