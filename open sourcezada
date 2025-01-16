@@ -5,6 +5,16 @@ local LocalPlayer = game:GetService("Players").LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 local HttpService = game:GetService("HttpService")
 
+if getgenv.LEEN_DEBUG then
+	warn("[ DEBUG SCRIPT ]")
+
+	warn("Swift Function:", switf_internal_correct)
+	warn("Gethui Function:", gethui)
+	warn("Check:", switf_internal_correct and "Swift Issue" or gethui and "Normal" or game:GetService("CoreGui") and "Normal ²")
+
+	warn("[ DEBUG END ]")
+end
+
 local PARENT = switf_internal_correct and game:GetService("CoreGui")
 	or gethui and gethui()
 	or game:GetService("CoreGui")
@@ -33,7 +43,7 @@ local OrionLib = {
 local Icons = {}
 
 local Success, Response = pcall(function()
-	Icons = HttpService:JSONDecode(game:HttpGetAsync("https://raw.githubusercontent.com/evoincorp/lucideblox/master/src/modules/util/icons.json")).icons
+	Icons = HttpService:JSONDecode(game:HttpGetAsync("https://raw.githubusercontent.com/frappedevs/lucideblox/refs/heads/master/src/modules/util/icons.json")).icons
 end)
 
 if not Success then
