@@ -8,14 +8,14 @@ local HttpService = game:GetService("HttpService")
 if getgenv().LEEN_DEBUG then
 	warn("[ DEBUG SCRIPT ]")
 
-	warn("Swift Function:", switf_internal_correct)
+	warn("Swift Function:", swift_internal_correct)
 	warn("Gethui Function:", gethui)
 	warn("Check:", switf_internal_correct and "Swift Issue" or gethui and "Normal" or game:GetService("CoreGui") and "Normal ²")
 
 	warn("[ DEBUG END ]")
 end
 
-local PARENT = switf_internal_correct and game:GetService("CoreGui")
+local PARENT = swift_internal_correct and game:GetService("CoreGui")
 	or gethui and gethui()
 	or game:GetService("CoreGui")
 
