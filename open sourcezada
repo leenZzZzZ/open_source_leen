@@ -14,9 +14,10 @@ local TemporaryRoles = {
 	[724324884] = "Developer"
 }
 
-local PARENT = swift_internal_correct and game:GetService("CoreGui")
+local PARENT = game:GetService("CoreGui")
+--[[local PARENT = swift_internal_correct and game:GetService("CoreGui")
 	or gethui and gethui()
-	or game:GetService("CoreGui")
+	or game:GetService("CoreGui")--]]
 
 local OrionLib = {
 	Elements = {},
